@@ -47,7 +47,6 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
-*.py,cover
 .hypothesis/
 .pytest_cache/
 
@@ -59,7 +58,6 @@ coverage.xml
 *.log
 local_settings.py
 db.sqlite3
-db.sqlite3-journal
 
 # Flask stuff:
 instance/
@@ -123,3 +121,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+*.xml
+.idea/pyBot.iml
+
+# custom
+*.txt
+cogs/Test.py
