@@ -352,8 +352,28 @@ class AntiRaid(commands.Cog):
             None
         """
         if ctx.invoked_subcommand is None:
-            pass
-            # TODO additional
+            pre = prefix(self, ctx)
+            embed = discord.Embed(
+                title="`Anti Raid` Commands",
+                colour=0xf368e0
+            )
+            embed.add_field(inline=False, name=f"{pre}ar create <raider role mention or ID>",
+                            value="Create anti raid system with given raider role")
+            embed.add_field(inline=False, name=f"{pre}ar no", value="Turn off the anti raid alarm if it's on.")
+            embed.add_field(inline=False, name=f"{pre}ar raid", value="Turn on the anti raid alarm if it's off.")
+            embed.add_field(inline=False, name=f"{pre}ar kick (True or False)",
+                            value="Kick all members inside the anti raid cell and pass in whether or not "
+                                  "to switch off the anti raid alarm. Default is no.")
+            embed.add_field(inline=False, name=f"{pre}ar ban (True or False)",
+                            value="Ban all members inside the anti raid cell and pass in whether or not to"
+                                  " switch off the anti raid alarm. Default is yes.")
+            embed.add_field(inline=False, name=f"{pre}ar cell", value="Show anti raid cell status.")
+            embed.add_field(inline=False, name=f"{pre}ar + <member mention or ID>",
+                            value="Add the target into the anti raid cell.")
+            embed.add_field(inline=False, name=f"{pre}ar - <user mention or ID>",
+                            value="Remove the target from the anti raid cell if they are in it.")
+            embed.add_field(inline=False, name=f"{pre}ar s", value="Bring up anti raid setting menu")
+            await ctx.send(embed=embed)
 
     async def verify(self, ctx: commands.Context):
         """

@@ -66,7 +66,7 @@ class Prefix(commands.Cog):
             if data is None:
                 await ctx.send("The default: **[]**")
             else:
-                await ctx.send(f"Prefix for this server is: **{data['prefix']}**")
+                await ctx.send(f"Prefix for this server is: **{data}**")
 
     @prefix.command()
     @commands.has_permissions(manage_guild=True)

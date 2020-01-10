@@ -239,7 +239,7 @@ class Notification(commands.Cog):
             await ctx.send(f"**#{channel}** is not a log channel")
         else:
             message = await ctx.send("Processing . . .")
-            ret = await self.setting_menu(channel, message, data, False)
+            ret = await self.setting_menu(channel, message, data, ctx.author, False)
             if ret:
                 temp = ret.data
                 self.db.update_one(
@@ -251,7 +251,7 @@ class Notification(commands.Cog):
                 )
 
     async def setting_menu(self, channel: discord.TextChannel, message: discord.Message, data: Notify,
-                           emoted: bool = True):
+                           original_author: typing.Union[discord.User, discord.Member], emoted: bool = True):
         """
         Async method for Notification class that changes the Notify class according to user input.
 
@@ -259,6 +259,7 @@ class Notification(commands.Cog):
             channel(discord.TextChannel): the target log channel
             message(discord.Message): the message of the summoned setting menu
             data(Notify): Notify class from before
+            original_author(typing.Union[discord.User, discord.Member]): original requester
             emoted(bool): whether or not the message already contain the necessary emotes
 
         Returns:
@@ -293,8 +294,8 @@ class Notification(commands.Cog):
             for i in self.reactions:
                 await message.add_reaction(emoji=i)
 
-        def check(reaction1, user1):
-            if (reaction1.message.id == message.id) and (user1.id == message.author.id):
+        def check(reaction1: discord.Reaction, user1: discord.User):
+            if (reaction1.message.id == message.id) and (user1.id == original_author.id):
                 if str(reaction1.emoji) in self.reactions:
                     return True
 
@@ -316,7 +317,7 @@ class Notification(commands.Cog):
             elif reaction.emoji == "❌":
 
                 def sure(reaction1, user1):
-                    if (reaction1.message.id == message.id) and (user1.id == message.author.id):
+                    if (reaction1.message.id == message.id) and (user1.id == original_author.id):
                         if str(reaction1.emoji) in self.second:
                             return True
 
@@ -344,7 +345,7 @@ class Notification(commands.Cog):
                 req = self.label[reaction.emoji]
                 res = data.data[req]
                 data.data[req] = False if res else True
-                ret = await self.setting_menu(channel, message, data)
+                ret = await self.setting_menu(channel, message, data, original_author)
                 return ret
 
     @commands.Cog.listener()
