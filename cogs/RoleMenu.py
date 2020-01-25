@@ -696,7 +696,7 @@ class RoleMenu(commands.Cog):
         except KeyError:
             return
         if data.active:
-            member = self.bot.get_guild(payload.guild_id).get_member(payload.user_id)
+            member = payload.member
             if member.bot:
                 return
             try:
@@ -736,7 +736,7 @@ class RoleMenu(commands.Cog):
         except KeyError:
             return
         if data.active and data.multiple:
-            member = self.bot.get_guild(payload.guild_id).get_member(payload.user_id)
+            member = payload.member
             if member.bot:
                 return
             role = data.data[payload.emoji.name if payload.emoji.is_unicode_emoji() else str(payload.emoji.id)]
