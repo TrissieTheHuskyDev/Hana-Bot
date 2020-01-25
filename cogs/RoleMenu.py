@@ -364,22 +364,22 @@ class RoleMenu(commands.Cog):
         emote = reaction.emoji
 
         if reaction.custom_emoji:
-            if not self.bot.get_emoji(reaction.emoji.id):
-                await message.edit(content="Please try use emote from this server or default ones")
-                await message.clear_reactions()
-                return
-            elif ret.contain_emote(reaction.emoji):
+            if ret.contain_emote(emote):
                 await message.edit(content=f"That emote already exists within {name} role menu. "
                                            f"Please try another one.")
                 await message.clear_reactions()
                 return
-            else:
+            elif isinstance(emote, discord.Emoji) and emote.is_usable():
                 emote = str(reaction.emoji.id)
                 custom = True
                 hold = reaction.emoji
                 if hold.guild.id != ctx.guild.id:
                     warn = f"\n⚠ Although Hana can use {hold}, it is not from this server. It is recommended to " \
                            f"use emotes from this server so you have full control."
+            else:
+                await message.edit(content="Please try use emote from this server or default ones")
+                await message.clear_reactions()
+                return
 
         hold = reaction
         mes = ""
