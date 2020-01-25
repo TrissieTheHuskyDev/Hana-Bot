@@ -493,6 +493,12 @@ class Notification(commands.Cog):
                         description=f"{member.mention} is **Live** in `{after.channel}`!"
                     )
                     label = "📺"
+                elif not after.self_stream and before.self_stream:
+                    embed = discord.Embed(
+                        colour=0x6c5ce7,
+                        description=f"{member.mention} is no longer live."
+                    )
+                    label = "⏹"
                 if embed:
                     embed.set_author(name="Voice Channel Update")
                     embed.set_footer(icon_url=member.avatar_url_as(size=64), text=label)
