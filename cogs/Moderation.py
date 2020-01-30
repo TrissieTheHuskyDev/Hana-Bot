@@ -76,6 +76,10 @@ class Moderation(commands.Cog):
                 return m.author == target
             special = f" **from {target}** "
         else:
+            if amount >= 1000:
+                await ctx.send("Please try to keep amount of messages to delete under 1000, action cancelled.")
+                return
+
             target = target.lower()
             if target not in ['embed', 'mention', 'attachments', 'attach', 'attachment', 'mentions', 'embeds',
                               'contain', 'contains', 'have', 'image', 'images', 'video', 'media']:
@@ -177,7 +181,7 @@ class Moderation(commands.Cog):
             embed = discord.Embed(
                 title="😔 Not Enough Permission", colour=0xf9ca24,
                 description="I don't have the permission required to perform prune. To do this, I will need: "
-                            "[Manage Messages] permission."
+                            "**Manage Messages** permission."
             )
             embed.set_footer(text=f"Input by {ctx.author}", icon_url=ctx.author.avatar_url_as(size=64))
             await ctx.send(embed=embed, delete_after=10)
@@ -312,6 +316,9 @@ class Moderation(commands.Cog):
         if ctx.guild.id in self.role:
             await ctx.send("Command on cooldown(1hr), please try again later.")
             return
+        if len(gives) <= 0:
+            await ctx.send("Please specify the roles to give")
+            return
         self.role.append(ctx.guild.id)
         people = ctx.guild.members
         size = len(people)
@@ -355,6 +362,9 @@ class Moderation(commands.Cog):
         """
         if ctx.guild.id in self.role:
             await ctx.send("Command on cooldown(1hr), please try again later.")
+            return
+        if len(removes) <= 0:
+            await ctx.send("Please specify the roles to remove")
             return
         self.role.append(ctx.guild.id)
         people = ctx.guild.members

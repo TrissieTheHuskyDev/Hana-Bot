@@ -151,7 +151,7 @@ async def on_command_error(ctx: commands.Context, error: Exception):
             report = f"{traceback.format_exc()}"
             mes = CustomTools.split_string(report, 1900)
             for i in range(len(mes)):
-                await bot.appinfo.owner.send(f"discord error page{i + 1}:\n```python\n{mes[i]}\n```")
+                await bot.appinfo.owner.send(f"discord error page **{i + 1}**:\n```python\n{mes[i]}\n```")
         raise error
 
 
