@@ -420,24 +420,6 @@ class Notification(commands.Cog):
                 if passing:
                     await channel.send(embed=embed)
 
-                async def image(title, b, a):
-                    await channel.send(f"{title}\n======================")
-                    await channel.send(embed=discord.Embed(
-                        colour=0x3498db,
-                        title=f"Before {title}"
-                    ).set_image(url=b))
-                    await channel.send(embed=discord.Embed(
-                        colour=0x3498db,
-                        title=f"After {title}"
-                    ).set_image(url=a))
-
-                if before.icon_url != after.icon_url:
-                    await image("Server Icon Update", before.icon_url, after.icon_url)
-                if before.banner_url != after.banner_url:
-                    await image("Server Banner Update", before.banner_url, after.banner_url)
-                if before.splash_url != after.splash_url:
-                    await image("Server Splash Screen Update", before.splash_url, after.splash_url)
-
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState,
                                     after: discord.VoiceState):

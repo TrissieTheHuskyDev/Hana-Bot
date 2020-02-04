@@ -3,6 +3,10 @@ from discord.ext import commands
 
 import typing
 import asyncio
+import requests
+import os
+import zipfile
+import shutil
 import CustomTools
 from CustomTools import ignore_check as ic
 from CustomTools import prefix
@@ -420,10 +424,6 @@ class Moderation(commands.Cog):
         # references:
         # https://stackabuse.com/creating-and-deleting-directories-with-python/
         # https://stackoverflow.com/questions/6996603/delete-a-file-or-folder
-        import requests
-        import os
-        import zipfile
-        import shutil
 
         try:
             os.makedirs(f"tmp/{ctx.guild.id}/animated")
@@ -455,9 +455,9 @@ class Moderation(commands.Cog):
                 zipf.write(os.path.join(root, file))
 
         zipf.close()
-        shutil.rmtree(f"tmp/{ctx.guild.id}/")
         await message.edit(content="File zipped, uploading...")
         await ctx.send(content=f"All the emotes for {ctx.guild.name}", file=discord.File(name))
+        shutil.rmtree(f"tmp/{ctx.guild.id}/")
         await message.delete()
         os.remove(name)
         self.instance.remove(ctx.guild.id)
