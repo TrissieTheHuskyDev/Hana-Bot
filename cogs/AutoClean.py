@@ -89,8 +89,8 @@ class AutoClean(commands.Cog):
             None
         """
         try:
-            temp = self.bot.get_cog("RoleMenu").dynamic[role.guild.id]
-            self.bot.mongodb["role_menu"].delete_many({"role_id": role.id})
+            temp = self.bot.get_cog("RoleMenu").db[role.guild.id]
+            self.bot.mongodb["static_role"].delete_many({"role_id": role.id})
             await temp.update(role.guild.id)
         except ValueError:
             pass
@@ -115,15 +115,6 @@ class AutoClean(commands.Cog):
         except KeyError:
             pass
 
-        try:
-            temp = self.bot.get_cog("StaticRole").data[role.guild.id]
-            self.bot.mongodb["static_role"].delete_many({"role_id": role.id})
-            await temp.update(role.guild.id)
-        except ValueError:
-            pass
-        except KeyError:
-            pass
-
     @commands.Cog.listener()
     async def on_guild_emojis_update(self, guild: discord.guild, before: list, after: list):
         """
@@ -141,7 +132,6 @@ class AutoClean(commands.Cog):
         # reference: https://www.geeksforgeeks.org/python-difference-two-lists/
         removed = [i for i in before if i not in after]
         for i in removed:
-            self.bot.mongodb["role_menu"].delete_one({"emoji": str(i.id)})
             self.bot.mongodb["pin"].delete_one({"emote": str(i.id)})
 
     # TODO additional auto clean feature here

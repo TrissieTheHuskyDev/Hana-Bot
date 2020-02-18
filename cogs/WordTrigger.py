@@ -731,19 +731,19 @@ class WordTrigger(commands.Cog):
             return
 
         try:
+            data = self.memory[message.guild.id]
+        except KeyError:
+            return
+
+        delete, word_type, problem = self.scanner(message, data)
+
+        try:
             location = self.bot.get_cog('Notification').memory[message.guild.id]
         except KeyError:
             return
 
         if not location:
             return
-
-        try:
-            data = self.memory[message.guild.id]
-        except KeyError:
-            return
-
-        delete, word_type, problem = self.scanner(message, data)
 
         if len(word_type) <= 0:
             return
