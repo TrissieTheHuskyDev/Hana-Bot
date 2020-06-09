@@ -5,70 +5,55 @@ import time
 import typing
 import datetime
 import asyncio
-from CustomTools import ignore_check as ic
-from CustomTools import BotCommanders as Details
 
 
 def verification(ver: discord.VerificationLevel):
     """
     Function that converts Verification Level type to string.
 
-    Args:
-        ver(discord.VerificationLevel): discord server verification level to convert
+    Parameters
+    ----------
+    ver : discord.VerificationLevel
+        discord server verification level to convert
 
-    Returns:
-        None
+    Returns
+    -------
+    str
+        the converted verification level
     """
-    if ver is discord.VerificationLevel.none:
-        return "Free crossing 🚶"
-    elif ver is discord.VerificationLevel.low:
-        return "visa? 📧"
-    elif ver is discord.VerificationLevel.medium:
-        return "5 minutes and older only ⌛"
-    elif ver is discord.VerificationLevel.high:
-        return "Wait 10 minute, have some tea ⏲💬"
-    else:
-        return "Can I have your number? 📱"
+    ret = {discord.VerificationLevel.none: "Free crossing 🚶",
+           discord.VerificationLevel.low: "visa? 📧",
+           discord.VerificationLevel.medium: "5 minutes and older only ⌛",
+           discord.VerificationLevel.high:  "Wait 10 minute, have some tea ⏲💬",
+           discord.VerificationLevel.extreme: "Can I have your number? 📱"}
+    return ret[ver]
 
 
 class Normal(commands.Cog):
     """
-    Class of Normal commands for Hana bot.
+    Class inherited from commands.Cog that contains normal user commands.
 
-    Attributes:
-        bot(commands.Bot): bot reference
+    Attributes
+    ----------
+    bot : commands.Bot
+        commands.Bot reference
     """
     def __init__(self, bot: commands.Bot):
         """
         Constructor for Normal class.
 
-        Args:
-            bot(commands.Bot): pass in bot reference
+        Parameters
+        ----------
+        bot : commands.Bot
+            pass in bot reference for the Cog
         """
         self.bot = bot
 
-    async def update(self):
-        """
-        Async method of Normal class that is required for hana bot function. [Not native to discord.py]
-
-        Returns:
-            None
-        """
-        pass
-
     # get bot connection command
-    @commands.command(aliases=["ping"])
-    async def connection(self, ctx: commands.Context):
-        """
-        Command for Normal class that will return the estimated bot ping.
-
-        Args:
-            ctx(commands.Context): pass in context for analysis and reply
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+    @commands.command(aliases=["connection"])
+    async def ping(self, ctx: commands.Context):
+        """Checks bot's Discord connection ping and process ping."""
+        if self.bot.ignore_check(ctx):
             return
 
         # Reference: https://stackoverflow.com/questions/46307035/ping-command-with-discord-py
@@ -101,64 +86,38 @@ class Normal(commands.Cog):
     # get avatar command
     @commands.command(aliases=["pfp"])
     async def avatar(self, ctx: commands.Context, target: discord.Member = None):
-        """
-        Command for Normal class that will attempt to return embed of target's avatar, if not then author's.
-
-        Args:
-            ctx(commands.Context): pass in context for reply
-            target(discord.Member): the target
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+        """Return the avatar of the target user."""
+        if self.bot.ignore_check(ctx):
             return
 
         person = ctx.author if not target else target
 
-        datLink = person.avatar_url
+        link = person.avatar_url
         embed = discord.Embed(
             timestamp=ctx.message.created_at,
             title=f"{person.name}'s Avatar:",
             colour=person.color,
-            url=f"{datLink}"
+            url=f"{link}"
         )
-        embed.set_image(url=f"{datLink}")
+        embed.set_image(url=f"{link}")
 
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['utc'])
-    async def UTC(self, ctx: commands.Context):
-        """
-        Command for Nomral class that returns the current time in UTC.
-
-        Args:
-            ctx(commands.Context): pass in context for reply
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+    @commands.command()
+    async def utc(self, ctx: commands.Context):
+        """Return the current UTC time."""
+        if self.bot.ignore_check(ctx):
             return
         await ctx.send(datetime.datetime.utcnow().strftime("UTC Time:\n`%B %#d, %Y`\n%I:%M %p"))
 
     # get user info
     @commands.command(aliases=["userinfo", "uinfo"])
     async def user_info(self, ctx: commands.Context, member: typing.Union[discord.Member, discord.User, int, None]):
-        """
-        Command for Normal that will return the target information.
-
-        Args:
-            ctx(commands.Context): pass in context for reply
-            member(typing.Union[discord.Member, discord.User, int, None]): variable for analysis
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+        """Returns information of the target user."""
+        if self.bot.ignore_check(ctx):
             return
 
-        admin = Details.has_control(ctx)
+        admin = self.bot.admins.check(ctx)
 
         if isinstance(member, int) and admin:
             member = await self.bot.fetch_user(member)
@@ -218,19 +177,11 @@ class Normal(commands.Cog):
     @commands.command(aliases=["sBanner", "sbanner", "banner"])
     @commands.guild_only()
     async def server_banner(self, ctx: commands.Context):
-        """
-        Command for Normal class that returns the server banner if used in a server.
-
-        Args:
-            ctx(commands.Context): pass in context for analysis and reply
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+        """Returns the server banner if any."""
+        if self.bot.ignore_check(ctx):
             return
 
-        if ctx.guild.banner is None:
+        if not ctx.guild.banner:
             await ctx.send("This server don't have a banner 😢")
         else:
             await ctx.send(embed=discord.Embed(
@@ -243,16 +194,8 @@ class Normal(commands.Cog):
     @commands.command(aliases=['sicon', 'spfp'])
     @commands.guild_only()
     async def server_icon(self, ctx: commands.Context):
-        """
-        Command for Normal class that returns the server icon if used in a server.
-
-        Args:
-            ctx(commands.Context): pass in context for analysis and reply
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+        """Returns the server icon."""
+        if self.bot.ignore_check(ctx):
             return
 
         await ctx.send(embed=discord.Embed(
@@ -265,16 +208,8 @@ class Normal(commands.Cog):
     @commands.command(aliases=['splash', 'sSplash'])
     @commands.guild_only()
     async def server_splash(self, ctx: commands.Context):
-        """
-        Command for Normal class that returns the server splash screen if used in a server.
-
-        Args:
-            ctx(commands.Context): pass in context for analysis and reply
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+        """Return server's join splash screen if any."""
+        if self.bot.ignore_check(ctx):
             return
 
         if ctx.guild.splash is None:
@@ -290,16 +225,8 @@ class Normal(commands.Cog):
     @commands.command(aliases=["sinfo"])
     @commands.guild_only()
     async def server_info(self, ctx: commands.Context):
-        """
-        Command for Normal class that returns the server information if used in a server.
-
-        Args:
-            ctx(commands.Context): pass in context for analysis and reply
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+        """Return an embed of basic server information."""
+        if self.bot.ignore_check(ctx):
             return
 
         server = ctx.guild
@@ -354,16 +281,8 @@ class Normal(commands.Cog):
 
     @commands.command(aliases=['ei'])
     async def emote_info(self, ctx: commands.Context):
-        """
-        Command for Normal class that will attempt to analyze requested emote to return either it's ID or UTF-8 form.
-
-        Args:
-            ctx(commands.Context): pass in  context for reply
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+        """Sends a message for User to react and return either emote ID or str of that emote."""
+        if self.bot.ignore_check(ctx):
             return
 
         message = await ctx.send("React to this message")
@@ -385,16 +304,8 @@ class Normal(commands.Cog):
     @commands.command(aliases=['lem'])
     @commands.guild_only()
     async def list_emotes(self, ctx: commands.Context):
-        """
-        Command for Normal class that list the emotes within the server in embed.
-
-        Args:
-            ctx(commands.Context): pass in Context for analysis and reply
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+        """Return an embed of server's emote list."""
+        if self.bot.ignore_check(ctx):
             return
         emotes = ctx.guild.emojis
         if len(emotes) <= 0:
@@ -433,36 +344,27 @@ class Normal(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["binfo"])
-    async def botinfo(self, ctx: commands.Context):
-        """
-        Command for Normal class that replies with Hana bot information.
-
-        Args:
-            ctx(commands.Context): pass in Context for reply
-
-        Returns:
-            None
-        """
-        if ic(self, ctx.channel):
+    async def info(self, ctx: commands.Context):
+        """Returns information about this bot."""
+        if self.bot.ignore_check(ctx):
             return
 
         embed = discord.Embed(
             colour=0x48dbfb,
-            title="I am a discord bot filled with random features! I am made using Python and implements "
-                  "MongoDB! Try out some command and you might like what I can do!"
+            title="I am a discord bot filled with random features! I am made using Python and implements MongoDB!"
         )
         embed.set_author(name=f"Hi! I am {self.bot.user.name}!",
                          icon_url="http://icons.iconarchive.com/icons/cornmanthe3rd/plex/128/Other-python-icon.png")
         embed.set_thumbnail(url=self.bot.user.avatar_url_as(size=256))
         creator = await self.bot.fetch_user(267909205225242624)
-        embed.add_field(name="Bot Master", value=self.bot.appinfo.owner.mention)
-        details = Details.workers
+        embed.add_field(name="Bot Master", value=self.bot.app_info.owner.mention)
+        details = self.bot.admins.data['admins']
         if len(details) > 0:
             embed.add_field(name="Bot Staffs", value="\n".join(f"> {i.mention}" for i in details), inline=False)
         embed.add_field(name="Creator / Developer",
-                        value=f"{creator.mention} / [Necomi#1555](https://github.com/Necom1/Hana-Bot)", inline=False)
+                        value=f"{creator.mention} / [Necomi#1555](https://github.com/Necom1)", inline=False)
         embed.add_field(name="I am born on", value=self.bot.user.created_at.strftime("%#d %B %Y, %I:%M %p UTC"))
-        embed.add_field(name="Support Server", value="[Flower Field](http://discord.gg/sWYPsU7)")
+        # embed.add_field(name="Support Server", value="[Flower Field](http://discord.gg/sWYPsU7)")
 
         embed.set_footer(text="v 0.9 | Beta", icon_url="https://i.imgur.com/RPrw70n.jpg")
 
@@ -471,27 +373,25 @@ class Normal(commands.Cog):
 
 def setup(bot: commands.Bot):
     """
-    Necessary function for a cog that initialize the Normal class.
+    Function necessary for loading Cogs.
 
-    Args:
-        bot (commands.Bot): passing in bot for class initialization
-
-    Returns:
-        None
+    Parameters
+    ----------
+    bot : commands.Bot
+        pass in bot reference to add Cog
     """
     bot.add_cog(Normal(bot))
-    print("Loaded Cog: Normal")
+    print("Load Cog:\tNormal")
 
 
 def teardown(bot: commands.Bot):
     """
-    Function to be called upon Cog unload, in this case, it will print message in CMD.
+    Function to be called upon unloading this Cog.
 
-    Args:
-        bot (commands.Bot): passing in bot reference for unload.
-
-    Returns:
-        None
+    Parameters
+    ----------
+    bot : commands.Bot
+        pass in bot reference to remove Cog
     """
     bot.remove_cog("Normal")
-    print("Unloaded Cog: Normal")
+    print("Unload Cog:\tNormal")

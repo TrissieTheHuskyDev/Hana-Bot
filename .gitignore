@@ -127,3 +127,7 @@ dmypy.json
 # custom
 *.txt
 cogs/Test.py
+Old Files
+.idea
+bot-commanders.json
+Research
